@@ -48,6 +48,10 @@ import { tokenPriceQuery } from './token'
  */
 const COMMUNITY_POOL_ADDRESS_PLACEHOLDER = 'COMMUNITY_POOL'
 
+const getIndexerUrl = (chainId: string) => {
+  return `https://indexer.daodao.zone/${chainId}`
+}
+
 export const daodaoBankBalancesHistoryQuery: Query<
   | {
       // Map of denom to balance.
@@ -77,7 +81,7 @@ export const daodaoBankBalancesHistoryQuery: Query<
       endTime ? new Date(Number(endTime)) : undefined
     )
 
-    return `https://indexer.daodao.zone/${chainId}/wallet/${address}/bank/balances?times=${BigInt(start * 1000).toString()}..${BigInt(end * 1000).toString()}&timeStep=${BigInt(interval * 1000).toString()}`
+    return `${getIndexerUrl(chainId)}/wallet/${address}/bank/balances?times=${BigInt(start * 1000).toString()}..${BigInt(end * 1000).toString()}&timeStep=${BigInt(interval * 1000).toString()}`
   },
   // Cache for:
   // - 1 minute when querying the past hour
@@ -103,7 +107,7 @@ export const daodaoCw20BalancesQuery: Query<
   name: 'daodao-cw20-balances',
   parameters: ['chainId', 'address'],
   url: ({ chainId, address }) =>
-    `https://indexer.daodao.zone/${chainId}/wallet/${address}/tokens/list`,
+    `${getIndexerUrl(chainId)}/wallet/${address}/tokens/list`,
   ttl: 60,
 }
 
@@ -136,7 +140,7 @@ export const daodaoCw20BalancesHistoryQuery: Query<
       endTime ? new Date(Number(endTime)) : undefined
     )
 
-    return `https://indexer.daodao.zone/${chainId}/wallet/${address}/tokens/list?times=${BigInt(start * 1000).toString()}..${BigInt(end * 1000).toString()}&timeStep=${BigInt(interval * 1000).toString()}`
+    return `${getIndexerUrl(chainId)}/wallet/${address}/tokens/list?times=${BigInt(start * 1000).toString()}..${BigInt(end * 1000).toString()}&timeStep=${BigInt(interval * 1000).toString()}`
   },
   // Cache for:
   // - 1 minute when querying the past hour
@@ -161,7 +165,7 @@ export const daodaoCw20BalancesHistoryQuery: Query<
 //   name: 'daodao-community-pool',
 //   parameters: ['chainId'],
 //   url: ({ chainId }) =>
-//     `https://indexer.daodao.zone/${chainId}/generic/_/communityPool/balances`,
+//     `${getIndexerUrl(chainId)}/generic/_/communityPool/balances`,
 //   ttl: 60,
 // }
 
@@ -193,7 +197,7 @@ export const daodaoCommunityPoolHistoryQuery: Query<
       endTime ? new Date(Number(endTime)) : undefined
     )
 
-    return `https://indexer.daodao.zone/${chainId}/generic/_/communityPool/balances?times=${BigInt(start * 1000).toString()}..${BigInt(end * 1000).toString()}&timeStep=${BigInt(interval * 1000).toString()}`
+    return `${getIndexerUrl(chainId)}/generic/_/communityPool/balances?times=${BigInt(start * 1000).toString()}..${BigInt(end * 1000).toString()}&timeStep=${BigInt(interval * 1000).toString()}`
   },
   // Cache for:
   // - 1 minute when querying the past hour
@@ -1029,7 +1033,7 @@ export const daodaoListItemsQuery: Query<
   name: 'daodao-list-items',
   parameters: ['chainId', 'address'],
   url: ({ chainId, address }) =>
-    `https://indexer.daodao.zone/${chainId}/contract/${address}/daoCore/listItems`,
+    `${getIndexerUrl(chainId)}/contract/${address}/daoCore/listItems`,
   ttl: 30,
 }
 
@@ -1106,7 +1110,7 @@ export const daodaoPolytoneAccountsQuery: Query<
   parameters: ['chainId', 'address'],
   // Mapping from polytone note contract to remote proxy address.
   url: ({ chainId, address }) =>
-    `https://indexer.daodao.zone/${chainId}/contract/${address}/daoCore/polytoneProxies`,
+    `${getIndexerUrl(chainId)}/contract/${address}/daoCore/polytoneProxies`,
   transform: (body, { chainId }) =>
     Object.entries(
       polytoneNoteProxyMapToChainIdMap(
@@ -1281,7 +1285,7 @@ export const daodaoIndexerContractQuery: Query<
   validate: ({ args }) =>
     args ? decodeJsonFromBase64(args) !== undefined : true,
   url: ({ chainId, address, formula, args }) =>
-    `https://indexer.daodao.zone/${chainId}/contract/${address}/${formula}?${new URLSearchParams(
+    `${getIndexerUrl(chainId)}/contract/${address}/${formula}?${new URLSearchParams(
       decodeJsonFromBase64(args)
     ).toString()}`,
   // Once every 5 seconds, since this may change at every chain block.
@@ -1651,7 +1655,7 @@ export const daodaoChainStatsDaosQuery: Query<
   parameters: ['chainId'],
   optionalParameters: ['daysAgo'],
   url: ({ chainId, daysAgo }) =>
-    `https://indexer.daodao.zone/${chainId}/generic/_/stats/daos${daysAgo ? `?daysAgo=${daysAgo}` : ''}`,
+    `${getIndexerUrl(chainId)}/generic/_/stats/daos${daysAgo ? `?daysAgo=${daysAgo}` : ''}`,
   // Update once per day.
   ttl: 24 * 60 * 60,
 }
@@ -1668,7 +1672,7 @@ export const daodaoChainStatsProposalsQuery: Query<
   parameters: ['chainId'],
   optionalParameters: ['daysAgo'],
   url: ({ chainId, daysAgo }) =>
-    `https://indexer.daodao.zone/${chainId}/generic/_/stats/proposals${daysAgo ? `?daysAgo=${daysAgo}` : ''}`,
+    `${getIndexerUrl(chainId)}/generic/_/stats/proposals${daysAgo ? `?daysAgo=${daysAgo}` : ''}`,
   // Update once per day.
   ttl: 24 * 60 * 60,
 }
@@ -1685,7 +1689,7 @@ export const daodaoChainStatsVotesQuery: Query<
   parameters: ['chainId'],
   optionalParameters: ['daysAgo'],
   url: ({ chainId, daysAgo }) =>
-    `https://indexer.daodao.zone/${chainId}/generic/_/stats/votes${daysAgo ? `?daysAgo=${daysAgo}` : ''}`,
+    `${getIndexerUrl(chainId)}/generic/_/stats/votes${daysAgo ? `?daysAgo=${daysAgo}` : ''}`,
   // Update once per day.
   ttl: 24 * 60 * 60,
 }
@@ -1702,7 +1706,7 @@ export const daodaoChainStatsUniqueVotersQuery: Query<
   parameters: ['chainId'],
   optionalParameters: ['daysAgo'],
   url: ({ chainId, daysAgo }) =>
-    `https://indexer.daodao.zone/${chainId}/generic/_/stats/uniqueVoters${daysAgo ? `?daysAgo=${daysAgo}` : ''}`,
+    `${getIndexerUrl(chainId)}/generic/_/stats/uniqueVoters${daysAgo ? `?daysAgo=${daysAgo}` : ''}`,
   // Update once per day.
   ttl: 24 * 60 * 60,
 }
@@ -1878,7 +1882,7 @@ export const daodaoIndexerQuery: Query<
   parameters: ['type', 'formula', 'chainId', 'address'],
   optionalParameters: ['args', 'ttl'],
   url: ({ type, formula, chainId, address, args }) =>
-    `https://indexer.daodao.zone/${chainId}/${type}/${address}/${formula}${args ? `?${args}` : ''}`,
+    `${getIndexerUrl(chainId)}/${type}/${address}/${formula}${args ? `?${args}` : ''}`,
   // Set minimum to 1 second and maximum to 1 week. Default to 5 minutes.
   ttl: ({ ttl }) =>
     ttl && !isNaN(Number(ttl))
